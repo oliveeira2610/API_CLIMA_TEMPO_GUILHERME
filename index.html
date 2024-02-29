@@ -12,17 +12,29 @@
   </head>
   <body>
     
-  <div id="text-container">
-  <h1>Consulta clima </h1>
+    <div id="movableDiv" class="filter"></div>
 
-  <form id="formClima">
-      <label for="cityInput">Cidade:</label>
-      <input type="text" id="cityInput" name="cityInput"> <br>
-      <button type="submit">consultar</button>
-  </form>
-  
-  <div id="climaResult"></div>
-</div>
+  <div class="card">
+    <div id="text-container">
+      <form id="formClima">
+          <label for="cityInput">Cidade:</label>
+          <input type="text" id="cityInput" name="cityInput"> <br>
+          <button type="submit">consultar</button>
+      </form>
+      
+
+    </div>
+  </div>
+  <div class="card2">
+    <div id="climaResult"></div>
+  </div>
+  <svg style="width: 0; height: 0; position: fixed;">
+    <filter id="filter">
+      <feGaussianBlur stdDeviation="10" in="SourceGraphic" edgeMode="none" result="blur" />
+      <feComposite in="blur" in2="SourceGraphic" operator="over" result="composite" />
+    </filter>
+  </svg>
+
   <script>
       document.getElementById('formClima').addEventListener('submit', function(event){
           event.preventDefault();

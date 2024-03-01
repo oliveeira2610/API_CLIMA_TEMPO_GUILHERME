@@ -8,6 +8,7 @@ html,body {
     
 }
 
+
 h1 {
     color: #daeefb;
     padding: 20px;
@@ -18,16 +19,14 @@ form {
     display: flex;
     flex-direction: column;
     align-items: center;
-    padding: 22px;
-    padding-top: 0%;
-    border-radius: 100px;
+    padding: 10px;
     width: 40rem;
     margin-top: 10%;
 }
 
 input[type="text"] {
     width: 60%;
-    padding: 10px;
+    padding: 2%;
     margin-bottom: 20px;
     border: 1px solid rgb(112, 112, 112);
     border-radius: 5px;
@@ -49,11 +48,14 @@ button[type="submit"]:hover {
 
 #climaResult {
     color: #daeefb;
-    padding: 20px;
-    margin-top: 20px;
+    margin-top: 40px;
     border-radius: 5px;
-    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    height: 5px;
+    display: flex;
+    justify-content: center;
 }
+
+
 
 .text-container {
     z-index: 100;
@@ -73,9 +75,12 @@ button[type="submit"]:hover {
   }
   
   :root {
-  
-    --color-bg1: rgb(108, 0, 162);
-    --color-bg2: rgb(0, 17, 82);
+    /* Variáveis para a cor de fundo */
+    --color-bg1: var(--default-bg1);
+    --color-bg2: var(--default-bg2);
+    /* Outras variáveis */
+    --default-bg1: #4210ce; /* Cor de fundo padrão 1 */
+    --default-bg2: #00c4f5; /* Cor de fundo padrão 2 */
     --color1: 18, 113, 255;
     --color2: 221, 74, 255;
     --color3: 100, 220, 255;
@@ -84,8 +89,7 @@ button[type="submit"]:hover {
     --color-interactive: 140, 100, 255;
     --circle-size: 80%;
     --blending: hard-light;
-  }
-  
+}
   @keyframes moveInCircle {
     0% {
       transform: rotate(0deg);
@@ -239,6 +243,8 @@ button[type="submit"]:hover {
     }
   }
 
+
+
   .filter {
     opacity: 0.25;
     top: 50%;
@@ -321,14 +327,15 @@ button[type="submit"]:hover {
   
   .card2 {
     --border-radius: 2rem;
-    width: 100%;
+    width: 60%;
+    height: 110%;
     aspect-ratio: 1;
     position: relative;
     z-index: unset;
-    background-color: black;
+    background-color: rgba(44, 44, 44, 0.474);
     border-radius: var(--border-radius);
     backdrop-filter: blur(1rem);
-  
+    margin-top: -80%;
     &:after {
       content: "";
       position: absolute;
@@ -385,4 +392,5 @@ button[type="submit"]:hover {
     box-sizing: border-box;
   }
   
-  
+
+

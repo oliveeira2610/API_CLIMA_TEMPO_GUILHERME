@@ -29,6 +29,7 @@
     "url": "https://github.com/oliveeira2610/API_clima_tempo/issues"
   },
   "dependencies": {
+    "path": "^0.12.7",
     "saas": "^1.0.0"
   }
 }

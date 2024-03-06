@@ -1,4 +1,4 @@
- <!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
@@ -8,102 +8,67 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Dongle:wght@700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="/src/style.css">
+    <link rel="stylesheet" href="./src/style.css">
   </head>
   <body>
     
+  <div id="text-container">
+  <h1>Consulta clima </h1>
 
-
-    
-
-
-
-    <div id="movableDiv" class="filter"></div>
-  <div class="card">
-    <div id="text-container">
-      <form id="formClima">
-          <label for="cityInput">Cidade:</label>
-          <input type="text" id="cityInput" name="cityInput"> <br>
-          <button type="submit">consultar</button>
-      </form>  
-    </div>
-   </div>
-
-   <div class="card2">
-    <div id="climaResult"></div>
-  </div>
-  <svg style="width: 0; height: 0; position: fixed;">
-    <filter id="filter">
-      <feGaussianBlur stdDeviation="10" in="SourceGraphic" edgeMode="none" result="blur" />
-      <feComposite in="blur" in2="SourceGraphic" operator="over" result="composite" />
-    </filter>
-  </svg>
-
-
-
-
-
+  <form id="formClima">
+      <label for="cityInput">Cidade:</label>
+      <input type="text" id="cityInput" name="cityInput"> <br>
+      <button type="submit">Consultar</button>
+  </form>
+  
+  <div id="climaResult"></div>
+</div>
   <script>
       document.getElementById('formClima').addEventListener('submit', function(event){
           event.preventDefault();
+
           const city = document.getElementById('cityInput').value;
-          console.log(city);
+
+console.log(city);
+
           fetch(`http://localhost:3000/climatempo/${city}`)
           .then(response => response.json())
           .then(data => {
               const tempoResult = document.getElementById('climaResult')
-              if(data.Temperatura){
-                  tempoResult.innerHTML = `Temperatura: ${data.Temperatura} °C <br>
-                  Umidade: ${data.Umidade}% <br>
-                  Velocidade do Vento: ${data.VelocidadeDoVento}m/s <br>
-                  Descrição do Clima: ${data.Clima}`;
 
-                  console.log(data.DescricaoClima); // Verificar a descrição do clima
-                  
-                  if (data.Clima.includes('Nubladas')) {
-                      document.documentElement.style.setProperty('--color-bg1', '#0000ff'); // Define a cor de fundo 1 como azul
-                      document.documentElement.style.setProperty('--color-bg2', '#ffff00'); // Define a cor de fundo 2 como amarelo
-                 }
-              //     if (data.clima.includes('Tempestade')) {
-              //   document.documentElement.style.setProperty('--color-bg1', '#0000ff'); // Define a cor de fundo 1 como azul
-              //   document.documentElement.style.setProperty('--color-bg2', '#ffff00'); // Define a cor de fundo 2 como amarelo
-              //  } else if (data.clima.includes('Garoa')) {
-              //   document.documentElement.style.setProperty('--color-bg1', '#808080'); // Define a cor de fundo 1 como cinza
-              //   document.documentElement.style.setProperty('--color-bg2', '#ffffff'); // Define a cor de fundo 2 como branco
-              //   } else if (data.clima.includes('Chuva')) {
-              //   document.documentElement.style.setProperty('--color-bg1', '#008000'); // Define a cor de fundo 1 como verde
-              //   document.documentElement.style.setProperty('--color-bg2', '#808080'); // Define a cor de fundo 2 como cinza
-              //  } else if (data.clima.includes('Neve')) {
-              //   document.documentElement.style.setProperty('--color-bg1', '#ffffff'); // Define a cor de fundo 1 como branco
-              //   document.documentElement.style.setProperty('--color-bg2', '#00ffff'); // Define a cor de fundo 2 como ciano
-              //  } else if (data.clima.includes('Névoa')) {
-              //   document.documentElement.style.setProperty('--color-bg1', '#d3d3d3'); // Define a cor de fundo 1 como cinza claro
-              //   document.documentElement.style.setProperty('--color-bg2', '#ffffff'); // Define a cor de fundo 2 como branco
-              //  } else if (data.clima.includes('Céu limpo')) {
-              //   document.documentElement.style.setProperty('--color-bg1', '#00ff00'); // Define a cor de fundo 1 como verde
-              //   document.documentElement.style.setProperty('--color-bg2', '#87ceeb'); // Define a cor de fundo 2 como azul claro
-              //  } else if (data.clima.includes('Parcialmente nublado')) {
-              //   document.documentElement.style.setProperty('--color-bg1', '#ffd700'); // Define a cor de fundo 1 como amarelo
-              //   document.documentElement.style.setProperty('--color-bg2', '#87ceeb'); // Define a cor de fundo 2 como azul claro
-              //  } else if (data.clima.includes('Nublado')) {
-              //   document.documentElement.style.setProperty('--color-bg1', '#808080'); // Define a cor de fundo 1 como cinza
-              //   document.documentElement.style.setProperty('--color-bg2', '#ffffff'); // Define a cor de fundo 2 como branco
-              //  } else {
-              //   console.log('Não foi possível determinar a cor do fundo para este clima.');
-              // }
+              if (data.Temperatura) {
+				tempoResult.innerHTML = `Temperatura: ${data.Temperatura} °C <br>
+			Umidade: ${data.Umidade}% <br>
+			Velocidade do Vento: ${data.VelocidadeDoVento}m/s <br>
+			Descrição do Clima: ${data.Clima}`;
 
-                      
-             }else{
+
+				if (data.Clima.includes('Nuvens quebradas')) {
+					document.documentElement.style.setProperty('--color-bg1', '#4a6d80'); // Define a cor de fundo 1 como azul
+					document.documentElement.style.setProperty('--color-bg2', '#82adc4'); // Define a cor de fundo 2 como amarelo
+				}
+
+        if (data.Clima.includes('Nubladas')) {
+					document.documentElement.style.setProperty('--color-bg1', '#373e42'); // Define a cor de fundo 1 como azul
+					document.documentElement.style.setProperty('--color-bg2', '#5d6061'); // Define a cor de fundo 2 como amarelo
+				}
+
+        if (data.Clima.includes('Nuvens dispersas')) {
+					document.documentElement.style.setProperty('--color-bg1', '#63b1db'); // Define a cor de fundo 1 como azul
+					document.documentElement.style.setProperty('--color-bg2', '#286382'); // Define a cor de fundo 2 como amarelo
+				}
+
+        if (data.Clima.includes('Poucas nuvens')) {
+					document.documentElement.style.setProperty('--color-bg1', '#2b8abd'); // Define a cor de fundo 1 como azul
+					document.documentElement.style.setProperty('--color-bg2', '#20aaf5'); // Define a cor de fundo 2 como amarelo
+				}
+              }else{
                   tempoResult.innerHTML = "Erro ao obter dados metereologicó";
-            }
+              }
           })
           .catch((error) => console.error("Erro ao obter dados"));
-
-        
       })
   </script>
-
-
 
   <div class="gradient-bg">
     <svg xmlns="http://www.w3.org/2000/svg">
@@ -125,12 +90,5 @@
     </div>
   </div>
     <script type="module" src="/src/main.ts"></script>
-
-
-
   </body>
 </html>
-
-
-
-

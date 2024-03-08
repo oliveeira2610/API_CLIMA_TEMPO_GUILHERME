@@ -42,10 +42,18 @@ console.log(city);
 			Velocidade do Vento: ${data.VelocidadeDoVento}m/s <br>
 			Descrição do Clima: ${data.Clima}`;
 
+        document.getElementById('weatherTemp').textContent = `${data.Temperatura} °C`;
+        document.getElementById('humidity').textContent = `${data.Umidade}%`;
+        document.getElementById('wind').textContent = `${data.VelocidadeDoVento} m/s`;
+        document.getElementById('weatherDesc').textContent = `${data.Clima}`;
+        document.getElementById('dateDayname').textContent = `${data.DayName}`;
+        document.getElementById('dateDay').textContent = `${data.Date}`;
+        document.getElementById('location').textContent = `${data.Location}`;
 
 				if (data.Clima.includes('Nuvens quebradas')) {
 					document.documentElement.style.setProperty('--color-bg1', '#4a6d80'); // Define a cor de fundo 1 como azul
 					document.documentElement.style.setProperty('--color-bg2', '#82adc4'); // Define a cor de fundo 2 como amarelo
+          
 				}
 
         if (data.Clima.includes('Nubladas')) {
@@ -150,6 +158,48 @@ console.log(city);
           .catch((error) => console.error("Erro ao obter dados"));
       })
   </script>
+
+<!-- cara do site -->
+<div class="container">
+  <div class="weather-side">
+    <div class="weather-gradient"></div>
+    <div class="date-container">
+      <h2 class="date-dayname" id="dateDayname"></h2><span class="date-day" id="dateDay"></span><i class="location-icon" data-feather="map-pin"></i><span class="location" id="location"></span>
+    </div>
+    <div class="weather-container"><i class="weather-icon" data-feather="sun"></i>
+      <h1 class="weather-temp" id="weatherTemp">°C</h1>
+      <h3 class="weather-desc" id="weatherDesc"></h3>
+    </div>
+  </div>
+  <div class="info-side">
+    <div class="today-info-container">
+      <div class="today-info">
+        <div class="visibilidade"> <span class="title">Visibilidade</span><span class="value" id="precipitation">Km</span>
+          <div class="clear"></div>
+        </div>
+        <div class="humidity"> <span class="title">Umidade</span><span class="value" id="humidity">%</span>
+          <div class="clear"></div>
+        </div>
+        <div class="wind"> <span class="title">Velocidade do vento</span><span class="value" id="wind">0 km/h</span>
+          <div class="clear"></div>
+        </div>
+      </div>
+    </div>
+    <div class="week-container">
+      <ul class="week-list">
+        <li class="active"><i class="day-icon" data-feather="sun"></i><span class="day-name">Tue</span><span class="day-temp">29°C</span></li>
+        <li><i class="day-icon" data-feather="cloud"></i><span class="day-name">Wed</span><span class="day-temp">21°C</span></li>
+        <li><i class="day-icon" data-feather="cloud-snow"></i><span class="day-name">Thu</span><span class="day-temp">08°C</span></li>
+        <li><i class="day-icon" data-feather="cloud-rain"></i><span class="day-name">Fry</span><span class="day-temp">19°C</span></li>
+        <div class="clear"></div>
+      </ul>
+    </div>
+    <div class="location-container">
+      <button class="location-button"> <i data-feather="map-pin"></i><span>Change location</span></button>
+    </div>
+  </div>
+</div>
+
 
   <div class="gradient-bg">
     <svg xmlns="http://www.w3.org/2000/svg">

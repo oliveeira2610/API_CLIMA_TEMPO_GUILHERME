@@ -1,270 +1,867 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <link rel="icon" type="image/svg+xml" href="/vite.svg" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Api clima tempo</title>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Dongle:wght@700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="./src/style.css">
-  </head>
-  <body>
-    
-  <div id="text-container">
-  <h1>Consulta clima </h1>
+<head>
+  <meta charset="UTF-8" />
+  <link rel="icon" type="image/svg+xml" href="/vite.svg" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Api clima tempo</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Dongle:wght@700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="./src/style.css">
+</head>
+<body>
 
-  <form id="formClima">
-      <label for="cityInput">Cidade:</label>
-      <input type="text" id="cityInput" name="cityInput"> <br>
-      <button type="submit">Consultar</button>
-  </form>
-  
-  <div id="climaResult"></div>
+<!-- cara do site -->
+<div class="container">
+  <div class="weather-side">
+    <div class="weather-gradient"></div>
+    <div class="date-container">
+      <h2 class="date-dayname" id="dateDayname"></h2>
+      <span class="date-day" id="dateDay"></span>
+      <i class="location-icon" data-feather="map-pin"></i>
+      <span class="location" id="location"></span>
+    </div>
+    <div class="weather-container">
+      <i class="weather-icon" data-feather="sun"></i>
+      <h1 class="weather-temp" id="weatherTemp"><span>°C</span></h1>
+      <h3 class="weather-desc" id="weatherDesc"></h3>
+    </div>
+  </div>
+  <div class="info-side">
+    <div class="today-info-container">
+      <div class="today-info">
+        <div class="visibilidade">
+          <span class="title">Visibilidade</span>
+          <span class="value" id="precipitation">Km</span>
+          <div class="clear"></div>
+        </div>
+        <div class="humidity">
+          <span class="title">Umidade</span>
+          <span class="value" id="humidity">%</span>
+          <div class="clear"></div>
+        </div>
+        <div class="wind">
+          <span class="title">Velocidade do vento</span>
+          <span class="value" id="wind">0 km/h</span>
+          <div class="clear"></div>
+        </div>
+      </div>
+    </div>
+    <div class="week-container">
+      <ul class="week-list">
+        <li class="active">
+          <i class="day-icon" data-feather="sun"></i>
+          <span class="day-name">Tue</span>
+          <span class="day-temp">29°C</span>
+        </li>
+        <li>
+          <i class="day-icon" data-feather="cloud"></i>
+          <span class="day-name">Wed</span>
+          <span class="day-temp">21°C</span>
+        </li>
+        <li>
+          <i class="day-icon" data-feather="cloud-snow"></i>
+          <span class="day-name">Thu</span>
+          <span class="day-temp">08°C</span>
+        </li>
+        <li>
+          <i class="day-icon" data-feather="cloud-rain"></i>
+          <span class="day-name">Fri</span>
+          <span class="day-temp">19°C</span>
+        </li>
+        <div class="clear"></div>
+      </ul>
+    </div>
+    <div class="location-container" id="locationContainer">
+      <input type="text" class="location-input" id="locationInput" name="consultButton"> <br>
+      <button class="location-button" id="consultButton">
+        <i data-feather="map-pin"></i><span>Consulte a cidade</span>
+      </button>
+    </div>
+  </div>
 </div>
-  <script>
-      document.getElementById('formClima').addEventListener('submit', function(event){
-          event.preventDefault();
 
-          const city = document.getElementById('cityInput').value;
 
-console.log(city);
+<div class="gradient-bg">
+  <svg xmlns="http://www.w3.org/2000/svg">
+    <defs>
+      <filter id="goo">
+        <feGaussianBlur in="SourceGraphic" stdDeviation="10" result="blur" />
+        <feColorMatrix in="blur" mode="matrix" values="1 0 0 0 0  0 1 0 0 0  0 0 1 0 0  0 0 0 18 -8" result="goo" />
+        <feBlend in="SourceGraphic" in2="goo" />
+      </filter>
+    </defs>
+  </svg>
+  <div class="gradients-container">
+    <div class="g1"></div>
+    <div class="g2"></div>
+    <div class="g3"></div>
+    <div class="g4"></div>
+    <div class="g5"></div>
+    <div class="interactive"></div>
+  </div>
+</div>
 
-          fetch(`http://localhost:3000/climatempo/${city}`)
-          .then(response => response.json())
-          .then(data => {
-              const tempoResult = document.getElementById('climaResult')
+<script>
+  document.getElementById('consultButton').addEventListener('click', function() {
+    const city = document.getElementById('locationInput').value;
 
-              if (data.Temperatura) {
-				tempoResult.innerHTML = `Temperatura: ${data.Temperatura} °C <br>
-			Umidade: ${data.Umidade}% <br>
-			Velocidade do Vento: ${data.VelocidadeDoVento}m/s <br>
-			Descrição do Clima: ${data.Clima}`;
+    fetch(`http://localhost:3000/climatempo/${city}`)
+      .then(response => response.json())
+      .then(data => {
+        if (data.Temperatura) {
+          document.getElementById('weatherTemp').textContent = `${Math.round(data.Temperatura)}°C`;
+          document.getElementById('humidity').textContent = `${data.Umidade}%`;
+          document.getElementById('wind').textContent = `${data.VelocidadeDoVento} m/s`;
+          document.getElementById('weatherDesc').textContent = `${data.Clima}`;
+          document.getElementById('dateDayname').textContent = `${data.DayName}`;
+          document.getElementById('dateDay').textContent = `${data.Date}`;
+          document.getElementById('location').textContent = `${data.Location}`;
 
-        document.getElementById('weatherTemp').textContent = `${data.Temperatura} °C`;
-        document.getElementById('humidity').textContent = `${data.Umidade}%`;
-        document.getElementById('wind').textContent = `${data.VelocidadeDoVento} m/s`;
-        document.getElementById('weatherDesc').textContent = `${data.Clima}`;
-        document.getElementById('dateDayname').textContent = `${data.DayName}`;
-        document.getElementById('dateDay').textContent = `${data.Date}`;
-        document.getElementById('location').textContent = `${data.Location}`;
+          if (data.Clima.includes('Nuvens quebradas')) {
+                    document.documentElement.style.setProperty('--color-bg1', '#4a6d80');
+                    document.documentElement.style.setProperty('--color-bg2', '#82adc4');
+                    document.documentElement.style.setProperty('--color1', '233, 240, 245');
+                    document.documentElement.style.setProperty('--color2', '233, 240, 245');
+                    document.documentElement.style.setProperty('--color3', '233, 240, 245');
+                    document.documentElement.style.setProperty('--color4', '233, 240, 245');
+                    document.documentElement.style.setProperty('--color5', '233, 240, 245');
+                    document.documentElement.style.setProperty('--color-interactive', '233, 240, 245');
+                }
 
-				if (data.Clima.includes('Nuvens quebradas')) {
-					document.documentElement.style.setProperty('--color-bg1', '#4a6d80'); // Define a cor de fundo 1 como azul
-					document.documentElement.style.setProperty('--color-bg2', '#82adc4'); // Define a cor de fundo 2 como amarelo
-          
-				}
 
         if (data.Clima.includes('Nubladas')) {
-					document.documentElement.style.setProperty('--color-bg1', '#373e42'); 
-					document.documentElement.style.setProperty('--color-bg2', '#5d6061'); 
-				}
+                    document.documentElement.style.setProperty('--color-bg1', '#828d94');
+                    document.documentElement.style.setProperty('--color-bg2', '#5d6061');
+                    document.documentElement.style.setProperty('--color1', '155, 186, 196');
+                    document.documentElement.style.setProperty('--color2', '155, 186, 196');
+                    document.documentElement.style.setProperty('--color3', '155, 186, 196');
+                    document.documentElement.style.setProperty('--color4', '155, 186, 196');
+                    document.documentElement.style.setProperty('--color5', '155, 186, 196');
+                    document.documentElement.style.setProperty('--color-interactive', '155, 186, 196');
+                }
+
 
         if (data.Clima.includes('Nuvens dispersas')) {
-					document.documentElement.style.setProperty('--color-bg1', '#63b1db'); 
-					document.documentElement.style.setProperty('--color-bg2', '#286382'); 
-				}
+                    document.documentElement.style.setProperty('--color-bg1', '#63b1db');
+                    document.documentElement.style.setProperty('--color-bg2', '#286382');
+                    document.documentElement.style.setProperty('--color1', '7, 165, 250');
+                    document.documentElement.style.setProperty('--color2', '7, 165, 250');
+                    document.documentElement.style.setProperty('--color3', '7, 165, 250');
+                    document.documentElement.style.setProperty('--color4', '7, 165, 250');
+                    document.documentElement.style.setProperty('--color5', '7, 165, 250');
+                    document.documentElement.style.setProperty('--color-interactive', '7, 165, 250');
+                }
+
 
         if (data.Clima.includes('Poucas nuvens')) {
-					document.documentElement.style.setProperty('--color-bg1', '#2b8abd'); 
-					document.documentElement.style.setProperty('--color-bg2', '#20aaf5'); 
-				}
+                    document.documentElement.style.setProperty('--color-bg1', '#2b8abd');
+                    document.documentElement.style.setProperty('--color-bg2', '#20aaf5');
+                    document.documentElement.style.setProperty('--color1', '111, 152, 227');
+                    document.documentElement.style.setProperty('--color2', '111, 152, 227');
+                    document.documentElement.style.setProperty('--color3', '111, 152, 227');
+                    document.documentElement.style.setProperty('--color4', '111, 152, 227');
+                    document.documentElement.style.setProperty('--color5', '111, 152, 227');
+                    document.documentElement.style.setProperty('--color-interactive', '111, 152, 227');
+                }
+
 
         if (data.Clima.includes('Tempestade')) {
-					document.documentElement.style.setProperty('--color-bg1', '#485063'); 
-					document.documentElement.style.setProperty('--color-bg2', '#393d45'); 
-				}
+                    document.documentElement.style.setProperty('--color-bg1', '#485063');
+                    document.documentElement.style.setProperty('--color-bg2', '#393d45');
+                    document.documentElement.style.setProperty('--color1', '0, 46, 156');
+                    document.documentElement.style.setProperty('--color2', '0, 46, 156');
+                    document.documentElement.style.setProperty('--color3', '0, 46, 156');
+                    document.documentElement.style.setProperty('--color4', '0, 46, 156');
+                    document.documentElement.style.setProperty('--color5', '0, 46, 156');
+                    document.documentElement.style.setProperty('--color-interactive', '0, 46, 156');
+                }
+
 
         if (data.Clima.includes('Tempestade com chuva leve')) {
-					document.documentElement.style.setProperty('--color-bg1', '#7188bd'); 
-					document.documentElement.style.setProperty('--color-bg2', '#6d95f2'); 
-				}
+                    document.documentElement.style.setProperty('--color-bg1', '#7188bd');
+                    document.documentElement.style.setProperty('--color-bg2', '#6d95f2');
+                    document.documentElement.style.setProperty('--color1', '95, 142, 250');
+                    document.documentElement.style.setProperty('--color2', '95, 142, 250');
+                    document.documentElement.style.setProperty('--color3', '95, 142, 250');
+                    document.documentElement.style.setProperty('--color4', '95, 142, 250');
+                    document.documentElement.style.setProperty('--color5', '95, 142, 250');
+                    document.documentElement.style.setProperty('--color-interactive', '95, 142, 250');
+                }
+
 
         if (data.Clima.includes('Tempestade com chuva')) {
-					document.documentElement.style.setProperty('--color-bg1', '#5b6b8f'); 
-					document.documentElement.style.setProperty('--color-bg2', '#2d3a59'); 
-				}
+                    document.documentElement.style.setProperty('--color-bg1', '#5b6b8f');
+                    document.documentElement.style.setProperty('--color-bg2', '#2d3a59');
+                    document.documentElement.style.setProperty('--color1', '143, 177, 255');
+                    document.documentElement.style.setProperty('--color2', '143, 177, 255');
+                    document.documentElement.style.setProperty('--color3', '143, 177, 255');
+                    document.documentElement.style.setProperty('--color4', '143, 177, 255');
+                    document.documentElement.style.setProperty('--color5', '143, 177, 255');
+                    document.documentElement.style.setProperty('--color-interactive', '143, 177, 255');
+                }
+
 
         if (data.Clima.includes('Tempestade com chuva intensa')) {
-					document.documentElement.style.setProperty('--color-bg1', '#1153ed'); 
-					document.documentElement.style.setProperty('--color-bg2', '#10285e'); 
-				}
+                    document.documentElement.style.setProperty('--color-bg1', '#1153ed');
+                    document.documentElement.style.setProperty('--color-bg2', '#10285e');
+                    document.documentElement.style.setProperty('--color1', '5, 48, 150');
+                    document.documentElement.style.setProperty('--color2', '5, 48, 150');
+                    document.documentElement.style.setProperty('--color3', '5, 48, 150');
+                    document.documentElement.style.setProperty('--color4', '5, 48, 150');
+                    document.documentElement.style.setProperty('--color5', '5, 48, 150');
+                    document.documentElement.style.setProperty('--color-interactive', '5, 48, 150');
+                }
+
 
         if (data.Clima.includes('Tempestade leve')) {
-					document.documentElement.style.setProperty('--color-bg1', '#3f89ba'); 
-					document.documentElement.style.setProperty('--color-bg2', '#096db0'); 
-				}
+                    document.documentElement.style.setProperty('--color-bg1', '#3f89ba');
+                    document.documentElement.style.setProperty('--color-bg2', '#096db0');
+                    document.documentElement.style.setProperty('--color1', '58, 205, 242');
+                    document.documentElement.style.setProperty('--color2', '58, 205, 242');
+                    document.documentElement.style.setProperty('--color3', '58, 205, 242');
+                    document.documentElement.style.setProperty('--color4', '58, 205, 242');
+                    document.documentElement.style.setProperty('--color5', '58, 205, 242');
+                    document.documentElement.style.setProperty('--color-interactive', '58, 205, 242');
+                }
+
 
         if (data.Clima.includes('Tempestade')) {
-					document.documentElement.style.setProperty('--color-bg1', '#568db3'); 
-					document.documentElement.style.setProperty('--color-bg2', '#91c2e3'); 
-				}
+                    document.documentElement.style.setProperty('--color-bg1', '#568db3');
+                    document.documentElement.style.setProperty('--color-bg2', '#91c2e3');
+                    document.documentElement.style.setProperty('--color1', '94, 189, 255');
+                    document.documentElement.style.setProperty('--color2', '94, 189, 255');
+                    document.documentElement.style.setProperty('--color3', '94, 189, 255');
+                    document.documentElement.style.setProperty('--color4', '94, 189, 255');
+                    document.documentElement.style.setProperty('--color5', '94, 189, 255');
+                    document.documentElement.style.setProperty('--color-interactive', '94, 189, 255');
+                }
+
 
         if (data.Clima.includes('Tempestade intensa')) {
-					document.documentElement.style.setProperty('--color-bg1', '#042338'); 
-					document.documentElement.style.setProperty('--color-bg2', '#032c80'); 
-				}
+                    document.documentElement.style.setProperty('--color-bg1', '#042338');
+                    document.documentElement.style.setProperty('--color-bg2', '#032c80');
+                    document.documentElement.style.setProperty('--color1', '66, 116, 150');
+                    document.documentElement.style.setProperty('--color2', '66, 116, 150');
+                    document.documentElement.style.setProperty('--color3', '66, 116, 150');
+                    document.documentElement.style.setProperty('--color4', '66, 116, 150');
+                    document.documentElement.style.setProperty('--color5', '66, 116, 150');
+                    document.documentElement.style.setProperty('--color-interactive', '66, 116, 150');
+                }
+
 
         if (data.Clima.includes('Tempestade irregular')) {
-					document.documentElement.style.setProperty('--color-bg1', '#32466e'); 
-					document.documentElement.style.setProperty('--color-bg2', '#4d6cab'); 
-				}
+                    document.documentElement.style.setProperty('--color-bg1', '#32466e');
+                    document.documentElement.style.setProperty('--color-bg2', '#4d6cab');
+                    document.documentElement.style.setProperty('--color1', '3, 109, 158');
+                    document.documentElement.style.setProperty('--color2', '3, 109, 158');
+                    document.documentElement.style.setProperty('--color3', '3, 109, 158');
+                    document.documentElement.style.setProperty('--color4', '3, 109, 158');
+                    document.documentElement.style.setProperty('--color5', '3, 109, 158');
+                    document.documentElement.style.setProperty('--color-interactive', '3, 109, 158');
+                }
+
 
         if (data.Clima.includes('Tempestade com garoa leve')) {
-					document.documentElement.style.setProperty('--color-bg1', '#91a2c2'); 
-					document.documentElement.style.setProperty('--color-bg2', '#637fb8'); 
-				}
+                    document.documentElement.style.setProperty('--color-bg1', '#91a2c2');
+                    document.documentElement.style.setProperty('--color-bg2', '#637fb8');
+                    document.documentElement.style.setProperty('--color1', '0, 140, 255');
+                    document.documentElement.style.setProperty('--color2', '0, 140, 255');
+                    document.documentElement.style.setProperty('--color3', '0, 140, 255');
+                    document.documentElement.style.setProperty('--color4', '0, 140, 255');
+                    document.documentElement.style.setProperty('--color5', '0, 140, 255');
+                    document.documentElement.style.setProperty('--color-interactive', '0, 140, 255');
+                }
+
 
         if (data.Clima.includes('Tempestade com garoa')) {
-					document.documentElement.style.setProperty('--color-bg1', '#3e62a8'); 
-					document.documentElement.style.setProperty('--color-bg2', '#708cc2'); 
-				}
+                    document.documentElement.style.setProperty('--color-bg1', '#3e62a8');
+                    document.documentElement.style.setProperty('--color-bg2', '#708cc2');
+                    document.documentElement.style.setProperty('--color1', 'rgb(62, 98, 168)'); // Azul mais escuro
+                    document.documentElement.style.setProperty('--color2', 'rgb(112, 140, 194)'); // Azul mais claro
+                    document.documentElement.style.setProperty('--color3', 'rgb(255, 255, 255)'); // Branco
+                    document.documentElement.style.setProperty('--color4', 'rgb(0, 0, 0)'); // Preto
+                    document.documentElement.style.setProperty('--color5', 'rgb(160, 160, 160)'); // Cinza
+                    document.documentElement.style.setProperty('--color-interactive', 'rgb(102, 204, 255)'); // Cor interativa (azul claro)
+                }
+
 
         if (data.Clima.includes('Tempestade com garoa intensa')) {
-					document.documentElement.style.setProperty('--color-bg1', '#62578f'); 
-					document.documentElement.style.setProperty('--color-bg2', '#362770'); 
-				}
+                    document.documentElement.style.setProperty('--color-bg1', '#62578f');
+                    document.documentElement.style.setProperty('--color-bg2', '#362770');
+                    document.documentElement.style.setProperty('--color1', 'rgb(98, 87, 143)');
+                    document.documentElement.style.setProperty('--color2', 'rgb(54, 39, 112)');
+                    document.documentElement.style.setProperty('--color3', 'rgb(255, 255, 255)');
+                    document.documentElement.style.setProperty('--color4', 'rgb(0, 0, 0)');
+                    document.documentElement.style.setProperty('--color5', 'rgb(160, 160, 160)');
+                    document.documentElement.style.setProperty('--color-interactive', 'rgb(102, 204, 255)');
+                }
+
 
         if (data.Clima.includes('Garoa')) {
-					document.documentElement.style.setProperty('--color-bg1', '#5f46c2'); 
-					document.documentElement.style.setProperty('--color-bg2', '#6a45ff'); 
-				}
+                    document.documentElement.style.setProperty('--color-bg1', '#5f46c2');
+                    document.documentElement.style.setProperty('--color-bg2', '#6a45ff');
+                    document.documentElement.style.setProperty('--color1', 'rgb(95, 70, 194)'); // Roxo mais escuro
+                    document.documentElement.style.setProperty('--color2', 'rgb(106, 69, 255)'); // Roxo mais claro
+                    document.documentElement.style.setProperty('--color3', 'rgb(255, 255, 255)'); // Branco
+                    document.documentElement.style.setProperty('--color4', 'rgb(0, 0, 0)'); // Preto
+                    document.documentElement.style.setProperty('--color5', 'rgb(160, 160, 160)'); // Cinza
+                    document.documentElement.style.setProperty('--color-interactive', 'rgb(102, 204, 255)'); // Cor interativa (azul claro)
+                }
+
+
+
 
         if (data.Clima.includes('Garoa de alta intensidade')) {
-					document.documentElement.style.setProperty('--color-bg1', '#200396'); 
-					document.documentElement.style.setProperty('--color-bg2', '#150652'); 
-				}
+                    document.documentElement.style.setProperty('--color-bg1', '#200396');
+                    document.documentElement.style.setProperty('--color-bg2', '#150652');
+                    document.documentElement.style.setProperty('--color1', 'rgb(32, 3, 150)'); // Azul mais escuro
+                    document.documentElement.style.setProperty('--color2', 'rgb(21, 6, 82)'); // Azul mais escuro
+                    document.documentElement.style.setProperty('--color3', 'rgb(255, 255, 255)'); // Branco
+                    document.documentElement.style.setProperty('--color4', 'rgb(0, 0, 0)'); // Preto
+                    document.documentElement.style.setProperty('--color5', 'rgb(160, 160, 160)'); // Cinza
+                    document.documentElement.style.setProperty('--color-interactive', 'rgb(102, 204, 255)'); // Cor interativa (azul claro)
+                }
+
+
+
 
         if (data.Clima.includes('Chuva garoando de baixa intensidade')) {
-					document.documentElement.style.setProperty('--color-bg1', '#3c61bd'); 
-					document.documentElement.style.setProperty('--color-bg2', '#5d87f0'); 
-				}
+                    document.documentElement.style.setProperty('--color-bg1', '#3c61bd');
+                    document.documentElement.style.setProperty('--color-bg2', '#5d87f0');
+                    document.documentElement.style.setProperty('--color1', 'rgb(60, 97, 189)'); // Azul mais escuro
+                    document.documentElement.style.setProperty('--color2', 'rgb(93, 135, 240)'); // Azul mais claro
+                    document.documentElement.style.setProperty('--color3', 'rgb(255, 255, 255)'); // Branco
+                    document.documentElement.style.setProperty('--color4', 'rgb(0, 0, 0)'); // Preto
+                    document.documentElement.style.setProperty('--color5', 'rgb(160, 160, 160)'); // Cinza
+                    document.documentElement.style.setProperty('--color-interactive', 'rgb(102, 204, 255)'); // Cor interativa (azul claro)
+                }
+
+
+
 
         if (data.Clima.includes('Chuva garoando')) {
-					document.documentElement.style.setProperty('--color-bg1', '#708edb'); 
-					document.documentElement.style.setProperty('--color-bg2', '#465e99'); 
-				}
+                    document.documentElement.style.setProperty('--color-bg1', '#708edb');
+                    document.documentElement.style.setProperty('--color-bg2', '#465e99');
+                    document.documentElement.style.setProperty('--color1', 'rgb(112, 142, 219)'); // Azul mais claro
+                    document.documentElement.style.setProperty('--color2', 'rgb(70, 94, 153)'); // Azul mais escuro
+                    document.documentElement.style.setProperty('--color3', 'rgb(255, 255, 255)'); // Branco
+                    document.documentElement.style.setProperty('--color4', 'rgb(0, 0, 0)'); // Preto
+                    document.documentElement.style.setProperty('--color5', 'rgb(160, 160, 160)'); // Cinza
+                    document.documentElement.style.setProperty('--color-interactive', 'rgb(102, 204, 255)'); // Cor interativa (azul claro)
+                }
+
+
+
 
         if (data.Clima.includes('Chuva garoando de alta intensidade')) {
-					document.documentElement.style.setProperty('--color-bg1', '#3969e3'); 
-					document.documentElement.style.setProperty('--color-bg2', '#1b43a8'); 
-				}
+                    document.documentElement.style.setProperty('--color-bg1', '#3969e3');
+                    document.documentElement.style.setProperty('--color-bg2', '#1b43a8');
+                    document.documentElement.style.setProperty('--color1', 'rgb(57, 105, 227)'); // Azul mais claro
+                    document.documentElement.style.setProperty('--color2', 'rgb(27, 67, 168)'); // Azul mais escuro
+                    document.documentElement.style.setProperty('--color3', 'rgb(255, 255, 255)'); // Branco
+                    document.documentElement.style.setProperty('--color4', 'rgb(0, 0, 0)'); // Preto
+                    document.documentElement.style.setProperty('--color5', 'rgb(160, 160, 160)'); // Cinza
+                    document.documentElement.style.setProperty('--color-interactive', 'rgb(102, 204, 255)'); // Cor interativa (azul claro)
+                }
 
-        if (data.Clima.includes('Chuva forte e garoa')) {
-					document.documentElement.style.setProperty('--color-bg1', '#7ecad6'); 
-					document.documentElement.style.setProperty('--color-bg2', '#77999e'); 
-				}
+
+
+
+       
+
 
         if (data.Clima.includes('Chuva forte e garoa intensa')) {
-					document.documentElement.style.setProperty('--color-bg1', '#0ecbe8'); 
-					document.documentElement.style.setProperty('--color-bg2', '#096270'); 
-				}
+                    document.documentElement.style.setProperty('--color-bg1', '#0ecbe8');
+                    document.documentElement.style.setProperty('--color-bg2', '#096270');
+                    document.documentElement.style.setProperty('--color1', 'rgb(57, 105, 227)'); // Azul mais claro
+                    document.documentElement.style.setProperty('--color2', 'rgb(27, 67, 168)'); // Azul mais escuro
+                    document.documentElement.style.setProperty('--color3', 'rgb(255, 255, 255)'); // Branco
+                    document.documentElement.style.setProperty('--color4', 'rgb(0, 0, 0)'); // Preto
+                    document.documentElement.style.setProperty('--color5', 'rgb(160, 160, 160)'); // Cinza
+                    document.documentElement.style.setProperty('--color-interactive', 'rgb(102, 204, 255)'); // Cor interativa (azul claro)
+                }
+
 
         if (data.Clima.includes('Garoa forte')) {
-					document.documentElement.style.setProperty('--color-bg1', '#92e8e5'); 
-					document.documentElement.style.setProperty('--color-bg2', '#abdbda'); 
-				}
+                    document.documentElement.style.setProperty('--color-bg1', '#92e8e5');
+                    document.documentElement.style.setProperty('--color-bg2', '#abdbda');
+                    document.documentElement.style.setProperty('--color1', 'rgb(57, 105, 227)'); // Azul mais claro
+                    document.documentElement.style.setProperty('--color2', 'rgb(27, 67, 168)'); // Azul mais escuro
+                    document.documentElement.style.setProperty('--color3', 'rgb(255, 255, 255)'); // Branco
+                    document.documentElement.style.setProperty('--color4', 'rgb(0, 0, 0)'); // Preto
+                    document.documentElement.style.setProperty('--color5', 'rgb(160, 160, 160)'); // Cinza
+                    document.documentElement.style.setProperty('--color-interactive', 'rgb(102, 204, 255)'); // Cor interativa (azul claro)
+                }
+
+
+
 
         if (data.Clima.includes('Chuva')) {
-					document.documentElement.style.setProperty('--color-bg1', '#65abcf'); 
-					document.documentElement.style.setProperty('--color-bg2', '#34aeeb'); 
-				}
+                    document.documentElement.style.setProperty('--color-bg1', '#65abcf');
+                    document.documentElement.style.setProperty('--color-bg2', '#34aeeb');
+                    document.documentElement.style.setProperty('--color1', 'rgb(57, 105, 227)'); // Azul mais claro
+                    document.documentElement.style.setProperty('--color2', 'rgb(27, 67, 168)'); // Azul mais escuro
+                    document.documentElement.style.setProperty('--color3', 'rgb(255, 255, 255)'); // Branco
+                    document.documentElement.style.setProperty('--color4', 'rgb(0, 0, 0)'); // Preto
+                    document.documentElement.style.setProperty('--color5', 'rgb(160, 160, 160)'); // Cinza
+                    document.documentElement.style.setProperty('--color-interactive', 'rgb(102, 204, 255)'); // Cor interativa (azul claro)
+                }
+
+
+
 
         if (data.Clima.includes('Chuva leve')) {
-					document.documentElement.style.setProperty('--color-bg1', '#7a75ba'); 
-					document.documentElement.style.setProperty('--color-bg2', '#3b3866'); 
-				}
+                    document.documentElement.style.setProperty('--color-bg1', '#7a75ba');
+                    document.documentElement.style.setProperty('--color-bg2', '#3b3866');
+                    document.documentElement.style.setProperty('--color1', 'rgb(57, 105, 227)'); // Azul mais claro
+                    document.documentElement.style.setProperty('--color2', 'rgb(27, 67, 168)'); // Azul mais escuro
+                    document.documentElement.style.setProperty('--color3', 'rgb(255, 255, 255)'); // Branco
+                    document.documentElement.style.setProperty('--color4', 'rgb(0, 0, 0)'); // Preto
+                    document.documentElement.style.setProperty('--color5', 'rgb(160, 160, 160)'); // Cinza
+                    document.documentElement.style.setProperty('--color-interactive', 'rgb(102, 204, 255)'); // Cor interativa (azul claro)
+                }
+
+
+
 
         if (data.Clima.includes('Chuva moderada')) {
-					document.documentElement.style.setProperty('--color-bg1', '#a5e6df'); 
-					document.documentElement.style.setProperty('--color-bg2', '#547a77'); 
-				}
+                    document.documentElement.style.setProperty('--color-bg1', '#a5e6df');
+                    document.documentElement.style.setProperty('--color-bg2', '#547a77');
+                    document.documentElement.style.setProperty('--color1', 'rgb(57, 105, 227)'); // Azul mais claro
+                    document.documentElement.style.setProperty('--color2', 'rgb(27, 67, 168)'); // Azul mais escuro
+                    document.documentElement.style.setProperty('--color3', 'rgb(255, 255, 255)'); // Branco
+                    document.documentElement.style.setProperty('--color4', 'rgb(0, 0, 0)'); // Preto
+                    document.documentElement.style.setProperty('--color5', 'rgb(160, 160, 160)'); // Cinza
+                    document.documentElement.style.setProperty('--color-interactive', 'rgb(102, 204, 255)'); // Cor interativa (azul claro)
+                }
+
+
+
 
         if (data.Clima.includes('Chuva intensa')) {
-					document.documentElement.style.setProperty('--color-bg1', '#54e8d9'); 
-					document.documentElement.style.setProperty('--color-bg2', '#1f7a71'); 
-				}
+                    document.documentElement.style.setProperty('--color-bg1', '#54e8d9');
+                    document.documentElement.style.setProperty('--color-bg2', '#1f7a71');
+                    document.documentElement.style.setProperty('--color1', 'rgb(57, 105, 227)'); // Azul mais claro
+                    document.documentElement.style.setProperty('--color2', 'rgb(27, 67, 168)'); // Azul mais escuro
+                    document.documentElement.style.setProperty('--color3', 'rgb(255, 255, 255)'); // Branco
+                    document.documentElement.style.setProperty('--color4', 'rgb(0, 0, 0)'); // Preto
+                    document.documentElement.style.setProperty('--color5', 'rgb(160, 160, 160)'); // Cinza
+                    document.documentElement.style.setProperty('--color-interactive', 'rgb(102, 204, 255)'); // Cor interativa (azul claro)
+                }
+
+
+
 
         if (data.Clima.includes('Chuva muito intensa')) {
-					document.documentElement.style.setProperty('--color-bg1', '#220596'); 
-					document.documentElement.style.setProperty('--color-bg2', '#211552'); 
-				}
+                    document.documentElement.style.setProperty('--color-bg1', '#220596');
+                    document.documentElement.style.setProperty('--color-bg2', '#211552');
+                    document.documentElement.style.setProperty('--color1', 'rgb(57, 105, 227)'); // Azul mais claro
+                    document.documentElement.style.setProperty('--color2', 'rgb(27, 67, 168)'); // Azul mais escuro
+                    document.documentElement.style.setProperty('--color3', 'rgb(255, 255, 255)'); // Branco
+                    document.documentElement.style.setProperty('--color4', 'rgb(0, 0, 0)'); // Preto
+                    document.documentElement.style.setProperty('--color5', 'rgb(160, 160, 160)'); // Cinza
+                    document.documentElement.style.setProperty('--color-interactive', 'rgb(102, 204, 255)'); // Cor interativa (azul claro)
+                }
+
+
+
 
         if (data.Clima.includes('Chuva extrema')) {
-					document.documentElement.style.setProperty('--color-bg1', '#0b0136'); 
-					document.documentElement.style.setProperty('--color-bg2', '#2b2640'); 
-				}
+                    document.documentElement.style.setProperty('--color-bg1', '#0b0136');
+                    document.documentElement.style.setProperty('--color-bg2', '#2b2640');
+                    document.documentElement.style.setProperty('--color1', 'rgb(57, 105, 227)'); // Azul mais claro
+                    document.documentElement.style.setProperty('--color2', 'rgb(27, 67, 168)'); // Azul mais escuro
+                    document.documentElement.style.setProperty('--color3', 'rgb(255, 255, 255)'); // Branco
+                    document.documentElement.style.setProperty('--color4', 'rgb(0, 0, 0)'); // Preto
+                    document.documentElement.style.setProperty('--color5', 'rgb(160, 160, 160)'); // Cinza
+                    document.documentElement.style.setProperty('--color-interactive', 'rgb(102, 204, 255)'); // Cor interativa (azul claro)
+                }
+
+
+
 
         if (data.Clima.includes('Chuva congelante')) {
-					document.documentElement.style.setProperty('--color-bg1', '#044c94'); 
-					document.documentElement.style.setProperty('--color-bg2', '#3e9bf7'); 
-				}
+                    document.documentElement.style.setProperty('--color-bg1', '#044c94');
+                    document.documentElement.style.setProperty('--color-bg2', '#3e9bf7');
+                    document.documentElement.style.setProperty('--color1', 'rgb(57, 105, 227)'); // Azul mais claro
+                    document.documentElement.style.setProperty('--color2', 'rgb(27, 67, 168)'); // Azul mais escuro
+                    document.documentElement.style.setProperty('--color3', 'rgb(255, 255, 255)'); // Branco
+                    document.documentElement.style.setProperty('--color4', 'rgb(0, 0, 0)'); // Preto
+                    document.documentElement.style.setProperty('--color5', 'rgb(160, 160, 160)'); // Cinza
+                    document.documentElement.style.setProperty('--color-interactive', 'rgb(102, 204, 255)'); // Cor interativa (azul claro)
+                }
+
+
+
 
         if (data.Clima.includes('Chuva de baixa intensidade')) {
-					document.documentElement.style.setProperty('--color-bg1', '#7ea5cc'); 
-					document.documentElement.style.setProperty('--color-bg2', '#4b7299'); 
-				}
+                    document.documentElement.style.setProperty('--color-bg1', '#7ea5cc');
+                    document.documentElement.style.setProperty('--color-bg2', '#4b7299');
+                    document.documentElement.style.setProperty('--color1', 'rgb(57, 105, 227)'); // Azul mais claro
+                    document.documentElement.style.setProperty('--color2', 'rgb(27, 67, 168)'); // Azul mais escuro
+                    document.documentElement.style.setProperty('--color3', 'rgb(255, 255, 255)'); // Branco
+                    document.documentElement.style.setProperty('--color4', 'rgb(0, 0, 0)'); // Preto
+                    document.documentElement.style.setProperty('--color5', 'rgb(160, 160, 160)'); // Cinza
+                    document.documentElement.style.setProperty('--color-interactive', 'rgb(102, 204, 255)'); // Cor interativa (azul claro)
+                }
+
+
+
 
         if (data.Clima.includes('Chuva')) {
-					document.documentElement.style.setProperty('--color-bg1', '#21588f'); 
-					document.documentElement.style.setProperty('--color-bg2', '#467bb0'); 
-				}
+                    document.documentElement.style.setProperty('--color-bg1', '#21588f');
+                    document.documentElement.style.setProperty('--color-bg2', '#467bb0');
+                    document.documentElement.style.setProperty('--color1', 'rgb(57, 105, 227)'); // Azul mais claro
+                    document.documentElement.style.setProperty('--color2', 'rgb(27, 67, 168)'); // Azul mais escuro
+                    document.documentElement.style.setProperty('--color3', 'rgb(255, 255, 255)'); // Branco
+                    document.documentElement.style.setProperty('--color4', 'rgb(0, 0, 0)'); // Preto
+                    document.documentElement.style.setProperty('--color5', 'rgb(160, 160, 160)'); // Cinza
+                    document.documentElement.style.setProperty('--color-interactive', 'rgb(102, 204, 255)'); // Cor interativa (azul claro)
+                }
+
+
+
 
         if (data.Clima.includes('Chuva de alta intensidade')) {
-					document.documentElement.style.setProperty('--color-bg1', '#032dff'); 
-					document.documentElement.style.setProperty('--color-bg2', '#021570'); 
-				}
+                    document.documentElement.style.setProperty('--color-bg1', '#032dff');
+                    document.documentElement.style.setProperty('--color-bg2', '#021570');
+                    document.documentElement.style.setProperty('--color1', 'rgb(57, 105, 227)'); // Azul mais claro
+                    document.documentElement.style.setProperty('--color2', 'rgb(27, 67, 168)'); // Azul mais escuro
+                    document.documentElement.style.setProperty('--color3', 'rgb(255, 255, 255)'); // Branco
+                    document.documentElement.style.setProperty('--color4', 'rgb(0, 0, 0)'); // Preto
+                    document.documentElement.style.setProperty('--color5', 'rgb(160, 160, 160)'); // Cinza
+                    document.documentElement.style.setProperty('--color-interactive', 'rgb(102, 204, 255)'); // Cor interativa (azul claro)
+                }
+
 
         if (data.Clima.includes('Chuva irregular')) {
-					document.documentElement.style.setProperty('--color-bg1', '#6095d6'); 
-					document.documentElement.style.setProperty('--color-bg2', '#3581de'); 
-				}
+                    document.documentElement.style.setProperty('--color-bg1', '#6095d6');
+                    document.documentElement.style.setProperty('--color-bg2', '#3581de');
+                    document.documentElement.style.setProperty('--color1', 'rgb(57, 105, 227)'); // Azul mais claro
+                    document.documentElement.style.setProperty('--color2', 'rgb(27, 67, 168)'); // Azul mais escuro
+                    document.documentElement.style.setProperty('--color3', 'rgb(255, 255, 255)'); // Branco
+                    document.documentElement.style.setProperty('--color4', 'rgb(0, 0, 0)'); // Preto
+                    document.documentElement.style.setProperty('--color5', 'rgb(160, 160, 160)'); // Cinza
+                    document.documentElement.style.setProperty('--color-interactive', 'rgb(102, 204, 255)'); // Cor interativa (azul claro)
+                }
+
+
+
 
         if (data.Clima.includes('Neve')) {
-					document.documentElement.style.setProperty('--color-bg1', '#8fa8c7'); 
-					document.documentElement.style.setProperty('--color-bg2', '#e9ecf0'); 
-				}
+                    document.documentElement.style.setProperty('--color-bg1', '#8fa8c7');
+                    document.documentElement.style.setProperty('--color-bg2', '#e9ecf0');
+                    document.documentElement.style.setProperty('--color1', '');
+                    document.documentElement.style.setProperty('--color2', '');
+                    document.documentElement.style.setProperty('--color3', '');
+                    document.documentElement.style.setProperty('--color4', '');
+                    document.documentElement.style.setProperty('--color5', '');
+                    document.documentElement.style.setProperty('--color-interactive', '');
+                }
+
 
         if (data.Clima.includes('Neve leve')) {
-					document.documentElement.style.setProperty('--color-bg1', '#687d96'); 
-					document.documentElement.style.setProperty('--color-bg2', '#8d9db0'); 
-				}
+                    document.documentElement.style.setProperty('--color-bg1', '#687d96');
+                    document.documentElement.style.setProperty('--color-bg2', '#8d9db0');
+                    document.documentElement.style.setProperty('--color1', '151, 204, 247');
+                    document.documentElement.style.setProperty('--color2', '151, 204, 247');
+                    document.documentElement.style.setProperty('--color3', '151, 204, 247');
+                    document.documentElement.style.setProperty('--color4', '151, 204, 247');
+                    document.documentElement.style.setProperty('--color5', '151, 204, 247');
+                    document.documentElement.style.setProperty('--color-interactive', '151, 204, 247');
+                }
+
 
         if (data.Clima.includes('Neve')) {
-					document.documentElement.style.setProperty('--color-bg1', '#95c0f5'); 
-					document.documentElement.style.setProperty('--color-bg2', '#506b8c'); 
-				}
+                    document.documentElement.style.setProperty('--color-bg1', '#95c0f5');
+                    document.documentElement.style.setProperty('--color-bg2', '#506b8c');
+                    document.documentElement.style.setProperty('--color1', '151, 204, 247');
+                    document.documentElement.style.setProperty('--color2', '151, 204, 247');
+                    document.documentElement.style.setProperty('--color3', '151, 204, 247');
+                    document.documentElement.style.setProperty('--color4', '151, 204, 247');
+                    document.documentElement.style.setProperty('--color5', '151, 204, 247');
+                    document.documentElement.style.setProperty('--color-interactive', '151, 204, 247');
+                }
+
 
         if (data.Clima.includes('Neve intensa')) {
-					document.documentElement.style.setProperty('--color-bg1', '#f7f7f7'); 
-					document.documentElement.style.setProperty('--color-bg2', '#acd0fc'); 
-				}
+                    document.documentElement.style.setProperty('--color-bg1', '#f7f7f7');
+                    document.documentElement.style.setProperty('--color-bg2', '#acd0fc');
+                    document.documentElement.style.setProperty('--color1', '151, 204, 247');
+                    document.documentElement.style.setProperty('--color2', '151, 204, 247');
+                    document.documentElement.style.setProperty('--color3', '151, 204, 247');
+                    document.documentElement.style.setProperty('--color4', '151, 204, 247');
+                    document.documentElement.style.setProperty('--color5', '151, 204, 247');
+                    document.documentElement.style.setProperty('--color-interactive', '151, 204, 247');
+                }
+
 
         if (data.Clima.includes('Aguaceiro')) {
-					document.documentElement.style.setProperty('--color-bg1', '#83d3f7'); 
-					document.documentElement.style.setProperty('--color-bg2', '#519bbd'); 
-				}
+                    document.documentElement.style.setProperty('--color-bg1', '#83d3f7');
+                    document.documentElement.style.setProperty('--color-bg2', '#519bbd');
+                    document.documentElement.style.setProperty('--color1', '151, 204, 247');
+                    document.documentElement.style.setProperty('--color2', '151, 204, 247');
+                    document.documentElement.style.setProperty('--color3', '151, 204, 247');
+                    document.documentElement.style.setProperty('--color4', '151, 204, 247');
+                    document.documentElement.style.setProperty('--color5', '151, 204, 247');
+                    document.documentElement.style.setProperty('--color-interactive', '151, 204, 247');
+                }
+
 
         if (data.Clima.includes('Aguaceiro leve')) {
-					document.documentElement.style.setProperty('--color-bg1', '#82a7b8'); 
-					document.documentElement.style.setProperty('--color-bg2', '#74d1fc'); 
-				}
+                    document.documentElement.style.setProperty('--color-bg1', '#82a7b8');
+                    document.documentElement.style.setProperty('--color-bg2', '#74d1fc');
+                    document.documentElement.style.setProperty('--color1', '151, 204, 247');
+                    document.documentElement.style.setProperty('--color2', '151, 204, 247');
+                    document.documentElement.style.setProperty('--color3', '151, 204, 247');
+                    document.documentElement.style.setProperty('--color4', '151, 204, 247');
+                    document.documentElement.style.setProperty('--color5', '151, 204, 247');
+                    document.documentElement.style.setProperty('--color-interactive', '151, 204, 247');
+                }
+
 
         if (data.Clima.includes('Aguaceiro')) {
-					document.documentElement.style.setProperty('--color-bg1', '#437a94'); 
-					document.documentElement.style.setProperty('--color-bg2', '#72a2b8'); 
-				}
+                    document.documentElement.style.setProperty('--color-bg1', '#437a94');
+                    document.documentElement.style.setProperty('--color-bg2', '#72a2b8');
+                    document.documentElement.style.setProperty('--color1', '151, 204, 247');
+                    document.documentElement.style.setProperty('--color2', '151, 204, 247');
+                    document.documentElement.style.setProperty('--color3', '151, 204, 247');
+                    document.documentElement.style.setProperty('--color4', '151, 204, 247');
+                    document.documentElement.style.setProperty('--color5', '151, 204, 247');
+                    document.documentElement.style.setProperty('--color-interactive', '151, 204, 247');
+                }
+
 
         if (data.Clima.includes('Chuva e neve leve')) {
-					document.documentElement.style.setProperty('--color-bg1', '#edf4f7'); 
-					document.documentElement.style.setProperty('--color-bg2', '#77bfe0'); 
-				}
+                    document.documentElement.style.setProperty('--color-bg1', '#edf4f7');
+                    document.documentElement.style.setProperty('--color-bg2', '#77bfe0');
+                    document.documentElement.style.setProperty('--color1', '151, 204, 247');
+                    document.documentElement.style.setProperty('--color2', '151, 204, 247');
+                    document.documentElement.style.setProperty('--color3', '151, 204, 247');
+                    document.documentElement.style.setProperty('--color4', '151, 204, 247');
+                    document.documentElement.style.setProperty('--color5', '151, 204, 247');
+                    document.documentElement.style.setProperty('--color-interactive', '151, 204, 247');
+                }
+
 
         if (data.Clima.includes('Chuva e neve')) {
-					document.documentElement.style.setProperty('--color-bg1', '#3fb9f2'); 
-					document.documentElement.style.setProperty('--color-bg2', '#96deff'); 
-				}
+                    document.documentElement.style.setProperty('--color-bg1', '#3fb9f2');
+                    document.documentElement.style.setProperty('--color-bg2', '#96deff');
+                    document.documentElement.style.setProperty('--color1', '151, 204, 247');
+                    document.documentElement.style.setProperty('--color2', '151, 204, 247');
+                    document.documentElement.style.setProperty('--color3', '151, 204, 247');
+                    document.documentElement.style.setProperty('--color4', '151, 204, 247');
+                    document.documentElement.style.setProperty('--color5', '151, 204, 247');
+                    document.documentElement.style.setProperty('--color-interactive', '151, 204, 247');
+                }
+
+
+        if (data.Clima.includes('Neve e chuva leve')) {
+                    document.documentElement.style.setProperty('--color-bg1', '#d3e3eb');
+                    document.documentElement.style.setProperty('--color-bg2', '#95d5f5');
+                    document.documentElement.style.setProperty('--color1', '151, 204, 247');
+                    document.documentElement.style.setProperty('--color2', '151, 204, 247');
+                    document.documentElement.style.setProperty('--color3', '151, 204, 247');
+                    document.documentElement.style.setProperty('--color4', '151, 204, 247');
+                    document.documentElement.style.setProperty('--color5', '151, 204, 247');
+                    document.documentElement.style.setProperty('--color-interactive', '151, 204, 247');
+                }
+        if (data.Clima.includes('Neve e chuva')) {
+                    document.documentElement.style.setProperty('--color-bg1', '#66ccff');
+                    document.documentElement.style.setProperty('--color-bg2', '#8bb5c9');
+                    document.documentElement.style.setProperty('--color1', '151, 204, 247');
+                    document.documentElement.style.setProperty('--color2', '151, 204, 247');
+                    document.documentElement.style.setProperty('--color3', '151, 204, 247');
+                    document.documentElement.style.setProperty('--color4', '151, 204, 247');
+                    document.documentElement.style.setProperty('--color5', '151, 204, 247');
+                    document.documentElement.style.setProperty('--color-interactive', '151, 204, 247');
+                }
+
+
+        if (data.Clima.includes('Neve e chuva intensa')) {
+                    document.documentElement.style.setProperty('--color-bg1', '#3bbeff');
+                    document.documentElement.style.setProperty('--color-bg2', '#286685');
+                    document.documentElement.style.setProperty('--color1', '151, 204, 247');
+                    document.documentElement.style.setProperty('--color2', '151, 204, 247');
+                    document.documentElement.style.setProperty('--color3', '151, 204, 247');
+                    document.documentElement.style.setProperty('--color4', '151, 204, 247');
+                    document.documentElement.style.setProperty('--color5', '151, 204, 247');
+                    document.documentElement.style.setProperty('--color-interactive', '151, 204, 247');
+                }
+
+
+        if (data.Clima.includes('Atmosfera')) {
+                    document.documentElement.style.setProperty('--color-bg1', '#a3b7c2');
+                    document.documentElement.style.setProperty('--color-bg2', '#8db7cc');
+                    document.documentElement.style.setProperty('--color1', '225, 240, 252');
+                    document.documentElement.style.setProperty('--color2', '225, 240, 252');
+                    document.documentElement.style.setProperty('--color3', '225, 240, 252');
+                    document.documentElement.style.setProperty('--color4', '225, 240, 252');
+                    document.documentElement.style.setProperty('--color5', '225, 240, 252');
+                    document.documentElement.style.setProperty('--color-interactive', '225, 240, 252');
+                }
+
+
+        if (data.Clima.includes('Névoa')) {
+                    document.documentElement.style.setProperty('--color-bg1', '#b9e4fa');
+                    document.documentElement.style.setProperty('--color-bg2', '#e0f5ff');
+                    document.documentElement.style.setProperty('--color1', '225, 240, 252');
+                    document.documentElement.style.setProperty('--color2', '225, 240, 252');
+                    document.documentElement.style.setProperty('--color3', '225, 240, 252');
+                    document.documentElement.style.setProperty('--color4', '225, 240, 252');
+                    document.documentElement.style.setProperty('--color5', '225, 240, 252');
+                    document.documentElement.style.setProperty('--color-interactive', '225, 240, 252');
+                }
+
+
+        if (data.Clima.includes('Fumaça')) {
+                    document.documentElement.style.setProperty('--color-bg1', '#f5f8fa');
+                    document.documentElement.style.setProperty('--color-bg2', '#d9dcde');
+                    document.documentElement.style.setProperty('--color1', '225, 240, 252');
+                    document.documentElement.style.setProperty('--color2', '225, 240, 252');
+                    document.documentElement.style.setProperty('--color3', '225, 240, 252');
+                    document.documentElement.style.setProperty('--color4', '225, 240, 252');
+                    document.documentElement.style.setProperty('--color5', '225, 240, 252');
+                    document.documentElement.style.setProperty('--color-interactive', '225, 240, 252');
+                }
+
+
+        if (data.Clima.includes('Neblina')) {
+                    document.documentElement.style.setProperty('--color-bg1', '#d2d3d4');
+                    document.documentElement.style.setProperty('--color-bg2', '#a3a7a8');
+                    document.documentElement.style.setProperty('--color1', '225, 240, 252');
+                    document.documentElement.style.setProperty('--color2', '225, 240, 252');
+                    document.documentElement.style.setProperty('--color3', '225, 240, 252');
+                    document.documentElement.style.setProperty('--color4', '225, 240, 252');
+                    document.documentElement.style.setProperty('--color5', '225, 240, 252');
+                    document.documentElement.style.setProperty('--color-interactive', '225, 240, 252');
+                }
+
+
+        if (data.Clima.includes('Redemoinhos de areia/poeira')) {
+                    document.documentElement.style.setProperty('--color-bg1', '#faa952');
+                    document.documentElement.style.setProperty('--color-bg2', '#bf9465');
+                    document.documentElement.style.setProperty('--color1', '204, 181, 106');
+                    document.documentElement.style.setProperty('--color2', '204, 181, 106');
+                    document.documentElement.style.setProperty('--color3', '204, 181, 106');
+                    document.documentElement.style.setProperty('--color4', '204, 181, 106');
+                    document.documentElement.style.setProperty('--color5', '204, 181, 106');
+                    document.documentElement.style.setProperty('--color-interactive', '204, 181, 106');
+                }
+
+
+        if (data.Clima.includes('Nevoeiro')) {
+                    document.documentElement.style.setProperty('--color-bg1', '#fcf4eb');
+                    document.documentElement.style.setProperty('--color-bg2', '#fffdfa');
+                    document.documentElement.style.setProperty('--color1', '204, 181, 106');
+                    document.documentElement.style.setProperty('--color2', '204, 181, 106');
+                    document.documentElement.style.setProperty('--color3', '204, 181, 106');
+                    document.documentElement.style.setProperty('--color4', '204, 181, 106');
+                    document.documentElement.style.setProperty('--color5', '204, 181, 106');
+                    document.documentElement.style.setProperty('--color-interactive', '204, 181, 106');
+                }
+
+
+        if (data.Clima.includes('Areia')) {
+                    document.documentElement.style.setProperty('--color-bg1', '#ba8f61');
+                    document.documentElement.style.setProperty('--color-bg2', '#947759');
+                    document.documentElement.style.setProperty('--color1', '204, 181, 106');
+                    document.documentElement.style.setProperty('--color2', '204, 181, 106');
+                    document.documentElement.style.setProperty('--color3', '204, 181, 106');
+                    document.documentElement.style.setProperty('--color4', '204, 181, 106');
+                    document.documentElement.style.setProperty('--color5', '204, 181, 106');
+                    document.documentElement.style.setProperty('--color-interactive', '204, 181, 106');
+                }
+
+
+        if (data.Clima.includes('Poeira')) {
+                    document.documentElement.style.setProperty('--color-bg1', '#9e6f3e');
+                    document.documentElement.style.setProperty('--color-bg2', '#c48745');
+                    document.documentElement.style.setProperty('--color1', '204, 181, 106');
+                    document.documentElement.style.setProperty('--color2', '204, 181, 106');
+                    document.documentElement.style.setProperty('--color3', '204, 181, 106');
+                    document.documentElement.style.setProperty('--color4', '204, 181, 106');
+                    document.documentElement.style.setProperty('--color5', '204, 181, 106');
+                    document.documentElement.style.setProperty('--color-interactive', '204, 181, 106');
+                }
+
+
+        if (data.Clima.includes('Cinzas vulcânicas')) {
+                    document.documentElement.style.setProperty('--color-bg1', '#4d2d0b');
+                    document.documentElement.style.setProperty('--color-bg2', '#824607');
+                    document.documentElement.style.setProperty('--color1', '5, 2, 59');
+                    document.documentElement.style.setProperty('--color2', '5, 2, 59');
+                    document.documentElement.style.setProperty('--color3', '5, 2, 59');
+                    document.documentElement.style.setProperty('--color4', '5, 2, 59');
+                    document.documentElement.style.setProperty('--color5', '5, 2, 59');
+                    document.documentElement.style.setProperty('--color-interactive', '5, 2, 59');
+                }
+
+
+        if (data.Clima.includes('Rajadas')) {
+                    document.documentElement.style.setProperty('--color-bg1', '#7baee8');
+                    document.documentElement.style.setProperty('--color-bg2', '#9fc7f5');
+                    document.documentElement.style.setProperty('--color1', '5, 2, 59');
+                    document.documentElement.style.setProperty('--color2', '5, 2, 59');
+                    document.documentElement.style.setProperty('--color3', '5, 2, 59');
+                    document.documentElement.style.setProperty('--color4', '5, 2, 59');
+                    document.documentElement.style.setProperty('--color5', '5, 2, 59');
+                    document.documentElement.style.setProperty('--color-interactive', '5, 2, 59');
+                }
+
+
+        if (data.Clima.includes('Tornado')) {
+                    document.documentElement.style.setProperty('--color-bg1', '#54a0f7');
+                    document.documentElement.style.setProperty('--color-bg2', '#2c88f2');
+                    document.documentElement.style.setProperty('--color1', '5, 2, 59');
+                    document.documentElement.style.setProperty('--color2', '5, 2, 59');
+                    document.documentElement.style.setProperty('--color3', '5, 2, 59');
+                    document.documentElement.style.setProperty('--color4', '5, 2, 59');
+                    document.documentElement.style.setProperty('--color5', '5, 2, 59');
+                    document.documentElement.style.setProperty('--color-interactive', '5, 2, 59');
+                }
+
+
+        if (data.Clima.includes('céu limpo')) {
+                    document.documentElement.style.setProperty('--color-bg1', '#b3d6ff');
+                    document.documentElement.style.setProperty('--color-bg2', '#a1cdff');
+                    document.documentElement.style.setProperty('--color1', '114, 208, 252');
+                    document.documentElement.style.setProperty('--color2', '114, 208, 252');
+                    document.documentElement.style.setProperty('--color3', '114, 208, 252');
+                    document.documentElement.style.setProperty('--color4', '114, 208, 252');
+                    document.documentElement.style.setProperty('--color5', '114, 208, 252');
+                    document.documentElement.style.setProperty('--color-interactive', '114, 208, 252');
+                   
+                }
+
+
+        if (data.Clima.includes('Nuvens')) {
+                    document.documentElement.style.setProperty('--color-bg1', '#99ddff');
+                    document.documentElement.style.setProperty('--color-bg2', '#82d2fa');
+                    document.documentElement.style.setProperty('--color1', '114, 208, 252');
+                    document.documentElement.style.setProperty('--color2', '114, 208, 252');
+                    document.documentElement.style.setProperty('--color3', '114, 208, 252');
+                    document.documentElement.style.setProperty('--color4', '114, 208, 252');
+                    document.documentElement.style.setProperty('--color5', '114, 208, 252');
+                    document.documentElement.style.setProperty('--color-interactive', '114, 208, 252');
+                   
+                }
+
+
+        if (data.Clima.includes('céu limpo')) {
+                    document.documentElement.style.setProperty('--color-bg1', '#b0dff7');
+                    document.documentElement.style.setProperty('--color-bg2', '#caeafa');
+                    document.documentElement.style.setProperty('--color1', '114, 208, 252');
+                    document.documentElement.style.setProperty('--color2', '114, 208, 252');
+                    document.documentElement.style.setProperty('--color3', '114, 208, 252');
+                    document.documentElement.style.setProperty('--color4', '114, 208, 252');
+                    document.documentElement.style.setProperty('--color5', '114, 208, 252');
+                    document.documentElement.style.setProperty('--color-interactive', '114, 208, 252');
+                   
+                }
+
 
               }else{
                   tempoResult.innerHTML = "Erro ao obter dados metereologicó";
@@ -274,67 +871,8 @@ console.log(city);
       })
   </script>
 
-<!-- cara do site -->
-<div class="container">
-  <div class="weather-side">
-    <div class="weather-gradient"></div>
-    <div class="date-container">
-      <h2 class="date-dayname" id="dateDayname"></h2><span class="date-day" id="dateDay"></span><i class="location-icon" data-feather="map-pin"></i><span class="location" id="location"></span>
-    </div>
-    <div class="weather-container"><i class="weather-icon" data-feather="sun"></i>
-      <h1 class="weather-temp" id="weatherTemp">°C</h1>
-      <h3 class="weather-desc" id="weatherDesc"></h3>
-    </div>
-  </div>
-  <div class="info-side">
-    <div class="today-info-container">
-      <div class="today-info">
-        <div class="visibilidade"> <span class="title">Visibilidade</span><span class="value" id="precipitation">Km</span>
-          <div class="clear"></div>
-        </div>
-        <div class="humidity"> <span class="title">Umidade</span><span class="value" id="humidity">%</span>
-          <div class="clear"></div>
-        </div>
-        <div class="wind"> <span class="title">Velocidade do vento</span><span class="value" id="wind">0 km/h</span>
-          <div class="clear"></div>
-        </div>
-      </div>
-    </div>
-    <div class="week-container">
-      <ul class="week-list">
-        <li class="active"><i class="day-icon" data-feather="sun"></i><span class="day-name">Tue</span><span class="day-temp">29°C</span></li>
-        <li><i class="day-icon" data-feather="cloud"></i><span class="day-name">Wed</span><span class="day-temp">21°C</span></li>
-        <li><i class="day-icon" data-feather="cloud-snow"></i><span class="day-name">Thu</span><span class="day-temp">08°C</span></li>
-        <li><i class="day-icon" data-feather="cloud-rain"></i><span class="day-name">Fry</span><span class="day-temp">19°C</span></li>
-        <div class="clear"></div>
-      </ul>
-    </div>
-    <div class="location-container">
-      <button class="location-button"> <i data-feather="map-pin"></i><span>Change location</span></button>
-    </div>
-  </div>
-</div>
 
-
-  <div class="gradient-bg">
-    <svg xmlns="http://www.w3.org/2000/svg">
-      <defs>
-        <filter id="goo">
-          <feGaussianBlur in="SourceGraphic" stdDeviation="10" result="blur" />
-          <feColorMatrix in="blur" mode="matrix" values="1 0 0 0 0  0 1 0 0 0  0 0 1 0 0  0 0 0 18 -8" result="goo" />
-          <feBlend in="SourceGraphic" in2="goo" />
-        </filter>
-      </defs>
-    </svg>
-    <div class="gradients-container">
-      <div class="g1"></div>
-      <div class="g2"></div>
-      <div class="g3"></div>
-      <div class="g4"></div>
-      <div class="g5"></div>
-      <div class="interactive"></div>
-    </div>
-  </div>
-    <script type="module" src="/src/main.ts"></script>
-  </body>
+<script type="module" src="/src/main.ts"></script>
+<script type="module" src="/dias.js"></script>
+</body>
 </html>
